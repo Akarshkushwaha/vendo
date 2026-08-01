@@ -2087,7 +2087,7 @@ export const createApps = (config: AppsConfig): AppsRuntime => {
         return "write";
       }
       const args = call.args as Record<string, Json>;
-      let targetAppId = typeof args.appId === "string" ? args.appId : undefined;
+      let targetAppId = typeof args.appId === "string" && args.appId.trim() !== "" ? args.appId : undefined;
       if (targetAppId === undefined) targetAppId = ctx.appId;
       if (targetAppId === undefined) {
         const list = await runtime.list(ctx);
@@ -2096,6 +2096,7 @@ export const createApps = (config: AppsConfig): AppsRuntime => {
       if (targetAppId === undefined || typeof args.instruction !== "string") {
         return "write";
       }
+      args.appId = targetAppId;
       const app = await owned(targetAppId, ctx.principal.subject);
       if (app === null) return "write";
       // Wave 9 — any ladder rung (steps/agentic automation or box work) is a

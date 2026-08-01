@@ -230,7 +230,7 @@ export const createAgentTools = (
       }
       if (call.tool === "vendo_apps_edit") {
         const args = input(call.args, ["instruction"], ["appId"]);
-        let targetAppId = args.appId as string | undefined;
+        let targetAppId = typeof args.appId === "string" && args.appId.trim() !== "" ? args.appId : undefined;
         if (targetAppId === undefined) targetAppId = ctx.appId;
         if (targetAppId === undefined) {
           const list = await runtime.list(ctx);
@@ -239,6 +239,7 @@ export const createAgentTools = (
         if (targetAppId === undefined) {
           throw new VendoError("validation", "appId is required because no app is currently active or recently created in this thread");
         }
+        args.appId = targetAppId;
         const result = await runtime.edit(targetAppId, args.instruction as string, ctx);
         return {
           status: "ok",
