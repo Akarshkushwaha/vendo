@@ -49,6 +49,7 @@ export const vendo = createVendo({
       "No emojis, ever — not in prose, not in generated UI text.",
       "Format money as currency (e.g. $1,234.56), never raw cents.",
       "When you render a view, let it carry the data — don't restate it in prose.",
+      "For a recurring or scheduled payment/task, use vendo_apps_create (or vendo_apps_edit on an existing app) — describe the schedule in the prompt; the automation is armed automatically. There is no separate automations tool.",
     ].join("\n"),
   },
   // execution-v2 Waves 4+9 — the layer-2 (machines) and layer-3 (served apps)
@@ -82,11 +83,10 @@ export const vendo = createVendo({
   // BYO Composio when Maple brings its own key; otherwise the slot stays
   // UNSET so a VENDO_API_KEY deployment composes the Cloud tools connector
   // (an explicit [] would read as "no connectors, ever" — the seam honors it).
-  // connectorApps scopes THAT auto-composed cloud pair to the same toolkits
-  // the BYO line uses — the demo never advertises the console's full catalog.
-  ...(composioApiKey
-    ? { connectors: [composioConnector({ apiKey: composioApiKey, apps: ["gmail", "slack"] })] }
-    : { connectorApps: ["gmail", "slack"] }),
+  // No apps scoping (2026-07-30 ruling): the dock offers every toolkit with
+  // an enabled auth config on the account, so new connectors go live by
+  // enabling them in Composio — no redeploy.
+  ...(composioApiKey ? { connectors: [composioConnector({ apiKey: composioApiKey })] } : {}),
   // Store posture — an explicit demo decision (README "Store posture"). The
   // DEPLOYED demo leaves this slot unset so the VENDO_API_KEY env ladder
   // composes the Cloud HOSTED store: Railway's container filesystem is
