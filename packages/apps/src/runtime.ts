@@ -757,6 +757,24 @@ const touchedPinSlots = (previous: AppDocument, next: AppDocument): string[] => 
   });
 };
 
+/** Resolves the target app id for an edit instruction, falling back to contextual state. */
+export const resolveEditTarget = async (
+  runtime: Pick<AppsRuntime, "list">,
+  args: Record<string, unknown>,
+  ctx: RunContext,
+): Promise<string | undefined> => {
+  if (args.appId !== undefined && (typeof args.appId !== "string" || (args.appId as string).trim() === "")) {
+    throw new VendoError("validation", "appId must be a non-empty string");
+  }
+  let targetAppId = args.appId as string | undefined;
+  if (targetAppId === undefined) targetAppId = ctx.appId;
+  if (targetAppId === undefined) {
+    const list = await runtime.list(ctx);
+    if (list.length > 0) targetAppId = list[0]?.id;
+  }
+  return targetAppId;
+};
+
 /** 06-apps §1 — construct the app lifecycle, generation, execution, and interchange surface. */
 export const createApps = (config: AppsConfig): AppsRuntime => {
   // Wave 9 — the experimental-flag relationship: a served (layer-3) surface
@@ -2087,12 +2105,7 @@ export const createApps = (config: AppsConfig): AppsRuntime => {
         return "write";
       }
       const args = call.args as Record<string, Json>;
-      let targetAppId = typeof args.appId === "string" && args.appId.trim() !== "" ? args.appId : undefined;
-      if (targetAppId === undefined) targetAppId = ctx.appId;
-      if (targetAppId === undefined) {
-        const list = await runtime.list(ctx);
-        if (list.length > 0) targetAppId = list[0]?.id;
-      }
+      const targetAppId = await resolveEditTarget(runtime, args, ctx);
       if (targetAppId === undefined || typeof args.instruction !== "string") {
         return "write";
       }

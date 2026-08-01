@@ -14,7 +14,7 @@ import {
   type VendoViewStreamingToolCall,
 } from "@vendoai/core";
 import type { AppDataAccess } from "./app-data.js";
-import type { AppsRuntime } from "./runtime.js";
+import { type AppsRuntime, resolveEditTarget } from "./runtime.js";
 
 const DRAFT_2020_12 = "https://json-schema.org/draft/2020-12/schema";
 
@@ -230,12 +230,7 @@ export const createAgentTools = (
       }
       if (call.tool === "vendo_apps_edit") {
         const args = input(call.args, ["instruction"], ["appId"]);
-        let targetAppId = typeof args.appId === "string" && args.appId.trim() !== "" ? args.appId : undefined;
-        if (targetAppId === undefined) targetAppId = ctx.appId;
-        if (targetAppId === undefined) {
-          const list = await runtime.list(ctx);
-          if (list.length > 0) targetAppId = list[0]?.id;
-        }
+        const targetAppId = await resolveEditTarget(runtime, args, ctx);
         if (targetAppId === undefined) {
           throw new VendoError("validation", "appId is required because no app is currently active or recently created in this thread");
         }
