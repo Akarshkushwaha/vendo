@@ -84,8 +84,7 @@ export async function assembleSystemPrompt(
   // agent places it, venue-gated.
   const catalog = system?.catalog?.trim();
   if (catalog && TREE_VENUES.has(ctx.venue)) {
-    sections.push(CATALOG_GROUNDING_PROMPT);
-    sections.push(catalog);
+    sections.push(`${CATALOG_GROUNDING_PROMPT}\n\n${catalog}`);
   }
 
   // Knowledge k8 (ENG-368): the static index + usage guidance rides only the
