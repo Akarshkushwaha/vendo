@@ -759,7 +759,6 @@ const touchedPinSlots = (previous: AppDocument, next: AppDocument): string[] => 
 
 /** Resolves the target app id for an edit instruction, falling back to contextual state. */
 export const resolveEditTarget = async (
-  runtime: Pick<AppsRuntime, "list">,
   args: Record<string, unknown>,
   ctx: RunContext,
 ): Promise<string | undefined> => {
@@ -768,10 +767,6 @@ export const resolveEditTarget = async (
   }
   let targetAppId = args.appId as string | undefined;
   if (targetAppId === undefined) targetAppId = ctx.appId;
-  if (targetAppId === undefined) {
-    const list = await runtime.list(ctx);
-    if (list.length > 0) targetAppId = list[0]?.id;
-  }
   return targetAppId;
 };
 
@@ -2105,7 +2100,7 @@ export const createApps = (config: AppsConfig): AppsRuntime => {
         return "write";
       }
       const args = call.args as Record<string, Json>;
-      const targetAppId = await resolveEditTarget(runtime, args, ctx);
+      const targetAppId = await resolveEditTarget(args, ctx);
       if (targetAppId === undefined || typeof args.instruction !== "string") {
         return "write";
       }
