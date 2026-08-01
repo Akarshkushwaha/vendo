@@ -2087,10 +2087,16 @@ export const createApps = (config: AppsConfig): AppsRuntime => {
         return "write";
       }
       const args = call.args as Record<string, Json>;
-      if (typeof args.appId !== "string" || typeof args.instruction !== "string") {
+      let targetAppId = typeof args.appId === "string" ? args.appId : undefined;
+      if (targetAppId === undefined) targetAppId = ctx.appId;
+      if (targetAppId === undefined) {
+        const list = await runtime.list(ctx);
+        if (list.length > 0) targetAppId = list[0]?.id;
+      }
+      if (targetAppId === undefined || typeof args.instruction !== "string") {
         return "write";
       }
-      const app = await owned(args.appId, ctx.principal.subject);
+      const app = await owned(targetAppId, ctx.principal.subject);
       if (app === null) return "write";
       // Wave 9 — any ladder rung (steps/agentic automation or box work) is a
       // write-class edit; only pure-tree instructions stay read-class.
