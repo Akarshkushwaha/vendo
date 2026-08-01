@@ -40,7 +40,7 @@ const descriptors: ToolDescriptor[] = [
   },
   {
     name: "vendo_apps_edit",
-    description: "Edit an existing Vendo app with one natural-language instruction — this is also how you add or change a recurring/scheduled automation on an app (e.g. \"send this every hour\"). If the result has failure.retryable=true, retry vendo_apps_edit on the same appId with a narrower instruction; do not rebuild it with vendo_apps_create. You may omit appId if editing the active app in this thread.",
+    description: "Edit an existing Vendo app with one natural-language instruction — this is also how you add or change a recurring/scheduled automation on an app (e.g. \"send this every hour\"). If the result has failure.retryable=true, retry vendo_apps_edit on the same appId with a narrower instruction; do not rebuild it with vendo_apps_create. You may omit appId if editing the app you just built or the active app in this thread.",
     inputSchema: {
       $schema: DRAFT_2020_12,
       type: "object",
@@ -230,9 +230,9 @@ export const createAgentTools = (
       }
       if (call.tool === "vendo_apps_edit") {
         const args = input(call.args, ["instruction"], ["appId"]);
-        const targetAppId = await resolveEditTarget(args, ctx);
+        const targetAppId = await resolveEditTarget(runtime, args, ctx);
         if (targetAppId === undefined) {
-          throw new VendoError("validation", "appId is required because no app is currently active in this thread");
+          throw new VendoError("validation", "appId is required because no app is currently active or recently created in this thread");
         }
         args.appId = targetAppId;
         const result = await runtime.edit(targetAppId, args.instruction as string, ctx);
