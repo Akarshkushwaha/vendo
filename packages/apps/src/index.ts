@@ -78,9 +78,9 @@ export {
 } from "./ship-diff.js";
 // The opt-in per-stage diagnostics event already surfaced through
 // GenerationDependencies.onPipeline — exported as a type so onPipeline
-// consumers (apps/genui-bench runner tap) can name what they accumulate.
+// consumers (tools/genui-bench runner tap) can name what they accumulate.
 export type { PipelineEvent } from "./pipeline.js";
-// The bench host surface (apps/genui-bench): the demo-bank catalog/tool/shape
+// The bench host surface (tools/genui-bench): the demo-bank catalog/tool/shape
 // loaders the live harnesses already share, exported because the exports map
 // closes deep imports. Data-only helpers — no engine behavior rides on them.
 // HostToolInfo is the tool slice those loaders (and GenerationDependencies)
@@ -91,6 +91,16 @@ export {
   loadDemoBankCatalog,
   loadDemoBankTools,
 } from "./bench/demo-bank-surface.js";
+// The model-capability rule (model-params.ts): which Claude ids still accept
+// sampling params, and the output cap for ids a sampling-era provider registry
+// does not know. Exported for the umbrella's model ladder — its lazy wrapper
+// reports a family id ("vendo-env"), so the resolved rung's REAL id must be
+// re-checked at call time (#692). Data-only rule — no engine behavior rides
+// on the export.
+export {
+  acceptsSamplingParams,
+  UNKNOWN_MODEL_MAX_OUTPUT_TOKENS,
+} from "./model-params.js";
 // The generation seam for the genui-bench vendo lane: the SAME modelEngine
 // createApps() rides, driven directly with production PipelineConfig defaults
 // (no forked engine config). Additive export — engine behavior is unchanged.
