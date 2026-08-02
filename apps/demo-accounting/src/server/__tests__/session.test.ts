@@ -84,7 +84,8 @@ describe("resolveCadenceSession", () => {
     const token = await accessToken(MAYA!.subject)
     const [header, payload, signature] = token.split(".")
     const tamperedSignature = (signature[0] === "A" ? "B" : "A") + signature.slice(1)
-    await expect(resolveCadenceSession(withCookie(`${header}.${payload}.${tamperedSignature}`))).resolves.toBeNull()
+    const tampered = `${header}.${payload}.${tamperedSignature}`
+    await expect(resolveCadenceSession(withCookie(tampered))).resolves.toBeNull()
     await expect(
       resolveCadenceSession(withCookie(await accessToken(MAYA!.subject, {
         expiresAt: Math.floor(Date.now() / 1000) - 10,
