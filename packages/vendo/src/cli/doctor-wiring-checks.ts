@@ -27,7 +27,7 @@ function checkGenericWiring(run: DoctorRun, wiring: VendoWiring): void {
   if (wiring.server) run.pass("wiring/server", "createVendo server wiring found");
   else run.fail("wiring/server", "E-WIRE-007", "no createVendo server wiring found — import createVendo from @vendoai/vendo/server and mount vendo.handler on your runtime's request entry");
   if (wiring.client) {
-    run.pass("wiring/client", wiring.legacyRoot ? "<VendoRoot> wraps the client (legacy)" : "<VendoProvider> wraps the client");
+    run.pass("wiring/client", (wiring.legacyRoot && !wiring.provider) ? "<VendoRoot> wraps the client (legacy)" : "<VendoProvider> wraps the client");
   } else {
     run.warn("wiring/client", "E-WIRE-008", "no <VendoProvider> found in the host source — the @vendoai/ui hooks and embeds need it; ignore this if the host renders a fully custom surface");
   }
@@ -37,7 +37,7 @@ function checkExpressWiring(run: DoctorRun, wiring: VendoWiring): void {
   if (wiring.server) run.pass("wiring/express-server", "Express server is wired");
   else run.fail("wiring/express-server", "E-WIRE-001", "Express server is not wired with createVendo from @vendoai/vendo/server");
   if (wiring.client) {
-    run.pass("wiring/express-client", wiring.legacyRoot ? "<VendoRoot> wraps the client (legacy)" : "<VendoProvider> wraps the client");
+    run.pass("wiring/express-client", (wiring.legacyRoot && !wiring.provider) ? "<VendoRoot> wraps the client (legacy)" : "<VendoProvider> wraps the client");
   } else {
     run.fail("wiring/express-client", "E-WIRE-002", "Express client is not wrapped in <VendoProvider>");
   }
@@ -102,7 +102,7 @@ async function checkServerActionsWiring(run: DoctorRun, routePath: string): Prom
 async function checkProviderMount(run: DoctorRun, wiring: VendoWiring): Promise<void> {
   const { root } = run;
   if (wiring.client) {
-    run.pass("wiring/next-root", wiring.legacyRoot ? "<VendoRoot> wraps the app (legacy)" : "<VendoProvider> wraps the app");
+    run.pass("wiring/next-root", (wiring.legacyRoot && !wiring.provider) ? "<VendoRoot> wraps the app (legacy)" : "<VendoProvider> wraps the app");
   } else {
     // The exact paste, not a description of it: init never edits user source,
     // so this is the one step a by-the-book install still owes, and doctor is
