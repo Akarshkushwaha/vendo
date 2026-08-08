@@ -118,7 +118,7 @@ export async function checkMcpDiscovery(run: DoctorRun, mcpPosture: "local" | "b
   let mountPath = `${new URL(run.statusUrl).pathname.replace(/\/$/, "")}/mcp`;
   if (urls) {
     const basePath = urls.publicUrl.pathname.replace(/\/$/, "");
-    if (basePath.length > 0 && mountPath.startsWith(basePath)) {
+    if (basePath.length > 0 && (mountPath === basePath || mountPath.startsWith(`${basePath}/`))) {
       mountPath = mountPath.slice(basePath.length);
     }
   }
